@@ -1,0 +1,216 @@
+import React, { useState } from 'react';
+ 
+const SDGs = {
+  3: "Good Health and Well-being",
+  4: "Quality Education",
+  6: "Clean Water and Sanitation",
+  7: "Affordable and Clean Energy",
+  8: "Decent Work and Economic Growth",
+  9: "Industry, Innovation and Infrastructure",
+  11: "Sustainable Cities and Communities",
+  12: "Responsible Consumption and Production",
+  13: "Climate Action",
+  14: "Life Below Water",
+  15: "Life on Land",
+  16: "Peace, Justice and Strong Institutions",
+  17: "Partnerships for the Goals"
+};
+ 
+const GeoFields = {
+  "Glaciology": [6, 13, 14, 15],
+  "Palaeoclimatology": [13, 14, 15],
+  "GIS & Remote Sensing": [11, 13, 15],
+  "Geomorphology": [11, 13, 15],
+  "Hydropower": [7, 9, 13],
+  "Volcanology": [11, 13, 15],
+  "Geophysics": [7, 9, 13],
+  "Geohazard Mitigation": [11, 13, 15],
+  "Seismology": [11, 13],
+  "Battery Technology": [7, 9, 12],
+  "Mining & Mineral Resources": [8, 9, 12],
+  "Science Outreach & Communication": [4, 17],
+  "Museum Curation": [4, 11],
+  "Palaeontology": [4, 15],
+  "Geoscience Research": [4, 9, 17],
+  "Science Policy": [16, 17],
+  "Non-Governmental Organizations": [17],
+  "Teaching": [4],
+  "Environmental Geochemistry": [6, 12, 15],
+  "Contaminated Land": [3, 6, 15],
+  "Renewable Energy": [7, 9, 13],
+  "Nuclear Energy": [7, 9, 13],
+  "Environmental/Landscape Protection": [13, 14, 15],
+  "Erosion Management": [13, 15],
+  "Carbon Capture & Storage": [7, 9, 13],
+  "Oceanography": [13, 14],
+  "Hydrogeology": [6, 14, 15],
+  "Engineering Geology": [9, 11],
+  "Geothermal Energy": [7, 9, 13],
+  "Critical Minerals": [9, 12],
+  "Geological Disposal of Radioactive Waste": [3, 12],
+  "Contaminated Groundwater": [3, 6, 15],
+  "Energy Storage": [7, 9, 13],
+  "Hydrocarbons": [7, 8, 9]
+};
+ 
+const careerSuggestions = {
+  "Environmental Scientist": ["Environmental Geochemistry", "Environmental/Landscape Protection", "Contaminated Land"],
+  "Climate Change Analyst": ["Palaeoclimatology", "Glaciology", "Carbon Capture & Storage"],
+  "Geophysicist": ["Geophysics", "Seismology", "GIS & Remote Sensing"],
+  "Hydrologist": ["Hydrogeology", "Contaminated Groundwater", "Oceanography"],
+  "Energy Geoscientist": ["Geothermal Energy", "Hydropower", "Renewable Energy"],
+  "Engineering Geologist": ["Engineering Geology", "Geohazard Mitigation", "Erosion Management"],
+  "Mineral Exploration Geologist": ["Mining & Mineral Resources", "Critical Minerals", "Geophysics"],
+  "Volcanologist": ["Volcanology", "Geohazard Mitigation", "Geophysics"],
+  "Geoscience Educator": ["Teaching", "Science Outreach & Communication", "Museum Curation"],
+  "Geopolitical Analyst": ["Science Policy", "Non-Governmental Organizations", "Geoscience Research"]
+};
+ 
+const GeoPathGame = () => {
+  const [step, setStep] = useState('sdg');
+  const [sdgInterests, setSdgInterests] = useState({});
+  const [geoInterests, setGeoInterests] = useState({});
+  const [result, setResult] = useState(null);
+ 
+  const handleSDGChange = (sdg, value) => {
+    setSdgInterests(prev => ({ ...prev, [sdg]: parseInt(value) }));
+  };
+ 
+  const handleGeoChange = (field, value) => {
+    setGeoInterests(prev => ({ ...prev, [field]: parseInt(value) }));
+  };
+ 
+  const calculateResult = () => {
+    const topSDGs = Object.entries(sdgInterests)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([sdg]) => sdg);
+   
+    const topFields = Object.entries(geoInterests)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([field]) => field);
+   
+    const matchScore = (field) => {
+      return GeoFields[field].filter(sdg => topSDGs.includes(sdg.toString())).length;
+    };
+ 
+    const bestMatches = topFields.sort((a, b) => matchScore(b) - matchScore(a)).slice(0, 3);
+   
+    const suggestedCareers = Object.entries(careerSuggestions)
+      .filter(([, fields]) => fields.some(field => bestMatches.includes(field)))
+      .slice(0, 3)
+      .map(([career]) => career);
+ 
+    setResult({ sdgs: topSDGs, fields: bestMatches, careers: suggestedCareers });
+    setStep('result');
+  };
+ 
+  const renderScale = () => (
+    <div style={{display: 'flex', justifyContent: 'space-between', marginTop: '5px', fontSize: '12px'}}>
+      {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+        <span key={num} style={{width: '20px', textAlign: 'center'}}>{num}</span>
+      ))}
+    </div>
+  );
+ 
+  const renderResults = () => (
+    <div style={{backgroundColor: '#f0f0f0', padding: '20px', borderRadius: '10px'}}>
+      <h2 style={{color: '#2c3e50', borderBottom: '2px solid #3498db', paddingBottom: '10px'}}>Your GeoPath Results</h2>
+     
+      <div style={{marginBottom: '20px'}}>
+        <h3 style={{color: '#2980b9'}}>Top Sustainable Development Goals:</h3>
+        <ol style={{fontSize: '16px', lineHeight: '1.6'}}>
+          {result.sdgs.map(sdg => (
+            <li key={sdg}><strong>{SDGs[sdg]}</strong></li>
+          ))}
+        </ol>
+      </div>
+ 
+      <div style={{marginBottom: '20px'}}>
+        <h3 style={{color: '#2980b9'}}>Best Matching Geoscience Fields:</h3>
+        <ol style={{fontSize: '16px', lineHeight: '1.6'}}>
+          {result.fields.map(field => (
+            <li key={field}>
+              <strong>{field}</strong>
+              <p style={{marginTop: '5px', fontSize: '14px'}}>Related SDGs: {GeoFields[field].map(num => `${num} (${SDGs[num]})`).join(', ')}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+ 
+      <div style={{marginBottom: '20px'}}>
+        <h3 style={{color: '#2980b9'}}>Suggested Career Paths:</h3>
+        <ol style={{fontSize: '16px', lineHeight: '1.6'}}>
+          {result.careers.map(career => (
+            <li key={career}><strong>{career}</strong></li>
+          ))}
+        </ol>
+      </div>
+ 
+      <div>
+        <h3 style={{color: '#2980b9'}}>Next Steps:</h3>
+        <ol style={{fontSize: '16px', lineHeight: '1.6'}}>
+          <li><strong>Research:</strong> Explore these geoscience fields and career paths in depth.</li>
+          <li><strong>Connect:</strong> Reach out to professionals in these areas for informational interviews.</li>
+          <li><strong>Skill up:</strong> Look for courses or workshops related to your top fields and SDGs.</li>
+          <li><strong>Gain experience:</strong> Seek internships or volunteer opportunities in these areas.</li>
+          <li><strong>Reflect:</strong> Consider how these paths align with your personal goals and values.</li>
+        </ol>
+      </div>
+    </div>
+  );
+ 
+  return (
+    <div style={{fontFamily: 'Arial, sans-serif', maxWidth: '800px', margin: 'auto', padding: '20px'}}>
+      <h1 style={{textAlign: 'center', color: '#2c3e50'}}>GeoPath: Career Compass</h1>
+     
+      {step === 'sdg' && (
+        <div>
+          <h2>Rate your interest in Sustainable Development Goals:</h2>
+          {Object.entries(SDGs).map(([num, sdg]) => (
+            <div key={num} style={{marginBottom: '20px'}}>
+              <label>{num}. {sdg}</label>
+              <input
+                type="range"
+                min="0"
+                max="10"
+                value={sdgInterests[num] || 0}
+                onChange={(e) => handleSDGChange(num, e.target.value)}
+                style={{width: '100%'}}
+              />
+              {renderScale()}
+            </div>
+          ))}
+          <button onClick={() => setStep('geo')} style={{marginTop: '20px', padding: '10px', fontSize: '16px'}}>Next</button>
+        </div>
+      )}
+ 
+      {step === 'geo' && (
+        <div>
+          <h2>Rate your interest in Geoscience Fields:</h2>
+          {Object.entries(GeoFields).map(([field, sdgs]) => (
+            <div key={field} style={{marginBottom: '20px'}}>
+              <label>{field}</label>
+              <p style={{fontSize: '14px', margin: '5px 0'}}>Related SDGs: {sdgs.map(num => `${num} (${SDGs[num]})`).join(', ')}</p>
+              <input
+                type="range"
+                min="0"
+                max="10"
+                value={geoInterests[field] || 0}
+                onChange={(e) => handleGeoChange(field, e.target.value)}
+                style={{width: '100%'}}
+              />
+              {renderScale()}
+            </div>
+          ))}
+          <button onClick={calculateResult} style={{marginTop: '20px', padding: '10px', fontSize: '16px'}}>See Results</button>
+        </div>
+      )}
+ 
+      {step === 'result' && result && renderResults()}
+    </div>
+  );
+};
+ 
+export default GeoPathGame;
