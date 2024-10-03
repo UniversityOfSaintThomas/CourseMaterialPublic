@@ -3,78 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Credit Hour and Time on Task Calculator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <title>Credit Hour Calculator</title>
     <style>
-        .card {
-            background-color: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            padding: 1.5rem;
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
         }
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
+        .calculator {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            max-width: 400px;
+            margin: 0 auto;
         }
-        .input-group {
-            margin-bottom: 1rem;
+        h1 {
+            text-align: center;
+            color: #333;
         }
-        .label {
+        label {
             display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
+            margin-bottom: 5px;
+            color: #666;
         }
-        .input {
+        input {
             width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.25rem;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
         }
-        .result {
-            font-size: 0.875rem;
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e7f3fe;
+            border-radius: 4px;
         }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="card w-full max-w-md">
-        <h2 class="card-title">Credit Hour Calculator</h2>
-        <div class="input-group">
-            <label for="creditHours" class="label">Credit Hours</label>
-            <input type="number" id="creditHours" class="input" value="0">
-        </div>
-        <div class="input-group">
-            <label for="weeks" class="label">Weeks in Semester</label>
-            <input type="number" id="weeks" class="input" value="15">
-        </div>
-        <div class="input-group">
-            <label class="label">Time on Task per Week</label>
-            <p id="weeklyTime" class="result">0 hours</p>
-        </div>
-        <div class="input-group">
-            <label class="label">Total Time on Task</label>
-            <p id="totalTime" class="result">0 hours</p>
-        </div>
+<body>
+    <div class="calculator">
+        <h1>Credit Hour Calculator</h1>
+        <form id="calculatorForm">
+            <label for="credits">Number of Credits:</label>
+            <input type="number" id="credits" min="1" max="4" step="0.5" required>
+            
+            <label for="termLength">Term Length (weeks):</label>
+            <input type="number" id="termLength" min="1" max="15" required>
+            
+            <button type="button" onclick="calculateHours()">Calculate</button>
+        </form>
+        <div id="result"></div>
     </div>
 
     <script>
-        function calculateTimeOnTask() {
-            const creditHours = parseFloat(document.getElementById('creditHours').value) || 0;
-            const weeksInSemester = parseFloat(document.getElementById('weeks').value) || 15;
+        function calculateHours() {
+            const credits = parseFloat(document.getElementById('credits').value);
+            const termLength = parseInt(document.getElementById('termLength').value);
+            const resultDiv = document.getElementById('result');
+            
+            console.log('Credits:', credits); // Debug log
+            console.log('Term Length:', termLength); // Debug log
 
-            const hoursPerWeek = creditHours * 3;
-            const totalHours = hoursPerWeek * weeksInSemester;
+            if (isNaN(credits) || isNaN(termLength) || credits < 1 || credits > 4 || termLength < 1 || termLength > 15) {
+                alert('Please enter valid values. Credits should be between 1 and 4, and term length should be between 1 and 15 weeks.');
+                return;
+            }
+            
+            const totalLearningTime = credits * 42.5;
+            const timeOnTaskPerWeek = (totalLearningTime / termLength).toFixed(1);
+            
+            console.log('Total Learning Time:', totalLearningTime); // Debug log
+            console.log('Time on Task per Week:', timeOnTaskPerWeek); // Debug log
 
-            document.getElementById('weeklyTime').textContent = `${hoursPerWeek.toFixed(1)} hours`;
-            document.getElementById('totalTime').textContent = `${totalHours.toFixed(1)} hours`;
+            resultDiv.innerHTML = `
+                <p><strong>Total Learning Time:</strong> ${totalLearningTime.toFixed(1)} hours</p>
+                <p><strong>Time on Task per Week:</strong> ${timeOnTaskPerWeek} hours</p>
+            `;
+
+            console.log('Result HTML:', resultDiv.innerHTML); // Debug log
         }
-
-        document.getElementById('creditHours').addEventListener('input', calculateTimeOnTask);
-        document.getElementById('weeks').addEventListener('input', calculateTimeOnTask);
-
-        // Initial calculation
-        calculateTimeOnTask();
     </script>
 </body>
 </html>
+Last edited 7 minutes ago
